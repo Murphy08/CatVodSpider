@@ -2,6 +2,7 @@ package com.github.catvod.crawler;
 
 import android.content.Context;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public abstract class Spider {
      * @param filter 是否开启筛选
      * @return
      */
-    public String homeContent(boolean filter) {
+    public String homeContent(boolean filter) throws JSONException {
         return "";
     }
 
