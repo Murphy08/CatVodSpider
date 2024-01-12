@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends Activity {
@@ -24,7 +25,8 @@ public class MainActivity extends Activity {
             public void run() {
                 FreeOk fo = new FreeOk();
                 fo.init(MainActivity.this);
-                fo.homeContent(false);
+
+                fo.searchContent("繁花",false);
             }
         }).start();
 
