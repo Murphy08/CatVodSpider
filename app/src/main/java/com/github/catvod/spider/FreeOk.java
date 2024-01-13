@@ -197,8 +197,7 @@ public class FreeOk extends Spider {
                     have_kuake = true;
                 }
             }
-            // hhhh
-            String y_result = String.join("$", yr);
+            String y_result = String.join("$$$", yr);
             Elements ju_ji = doc.select("#panel1 > div > div");
             ArrayList<String> yuan_men = new ArrayList<>();
             ArrayList<String> ji_men = new ArrayList<>();
@@ -223,8 +222,7 @@ public class FreeOk extends Spider {
                 ji_men.clear();
                 yuan_men.add(y_all);
             }
-            //  hhhh
-            String v_url = String.join("$", yuan_men);
+            String v_url = String.join("$$$", yuan_men);
 
             list.put("vod_name", name);
             list.put("vod_pic", pic);
