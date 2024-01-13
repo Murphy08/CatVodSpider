@@ -168,6 +168,7 @@ public class FreeOk extends Spider {
 
     @Override
     public String detailContent(List<String> ids) {
+        Log.e("hihihihhi", "调用了详细页面" + ids.toString());
         boolean have_kuake = false;
         JSONObject result = new JSONObject();
         JSONArray ja = new JSONArray();
@@ -256,6 +257,7 @@ public class FreeOk extends Spider {
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) {
+        Log.e("hihihihhi", "调用了playerContent" + flag + "   " + id + "    " + vipFlags.toString());
         try {
             //定义播放用的headers
             JSONObject headers = new JSONObject();
@@ -281,7 +283,7 @@ public class FreeOk extends Spider {
                     result.put("parse", 0);
                     result.put("playUrl", u);
                     result.put("url", u);
-                    result.put("header", headers);
+                    result.put("header", headers.toString());
                     break;
                 }
             }
