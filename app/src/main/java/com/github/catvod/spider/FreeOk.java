@@ -15,6 +15,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,7 @@ public class FreeOk extends Spider {
      * 筛选配置
      */
     private JSONObject filterConfig;
+
     @Override
     public void init(Context context) {
         super.init(context);
@@ -181,45 +183,45 @@ public class FreeOk extends Spider {
             String va = doc.select("body > div > div.main > div > div.module.module-info > div.module-main > div.module-info-main > div.module-info-heading > div.module-info-tag > div:nth-child(2)").text();
             String vr = doc.select("body > div > div.main > div > div.module.module-info > div.module-main > div.module-info-main > div.module-info-content > div.module-info-items > div:nth-child(6) > div").text();
             String vac = doc.select("body > div > div.main > div > div.module.module-info > div.module-main > div.module-info-main > div.module-info-content > div.module-info-items > div:nth-child(4) > div").text();
-            String  vd = doc.select("body > div > div.main > div > div.module.module-info > div.module-main > div.module-info-main > div.module-info-content > div.module-info-items > div:nth-child(2) > div > a").text();
+            String vd = doc.select("body > div > div.main > div > div.module.module-info > div.module-main > div.module-info-main > div.module-info-content > div.module-info-items > div:nth-child(2) > div > a").text();
             String vct = doc.select("body > div > div.main > div > div.module.module-info > div.module-main > div.module-info-main > div.module-info-content > div.module-info-items > div.module-info-item.module-info-introduction > div > p").text();
             Elements yuan = doc.select("#y-playList > div");
             ArrayList<String> yr = new ArrayList<String>();
-            for (Element ee:yuan) {
+            for (Element ee : yuan) {
                 String y = ee.select("span").text();
 
-                if (!y.equals("夸克4K")){
+                if (!y.equals("夸克4K")) {
                     yr.add(y);
-                }else {
+                } else {
                     have_kuake = true;
                 }
             }
-            String y_result = String.join("$$$",yr);
-            Elements ju_ji =doc.select("#panel1 > div > div");
+            String y_result = String.join("$$$", yr);
+            Elements ju_ji = doc.select("#panel1 > div > div");
             ArrayList<String> yuan_men = new ArrayList<>();
             ArrayList<String> ji_men = new ArrayList<>();
-            for (Element es:ju_ji){
-                if(have_kuake){
-                    have_kuake =false;
+            for (Element es : ju_ji) {
+                if (have_kuake) {
+                    have_kuake = false;
                     continue;
                 }
 
                 Elements pian = es.select("a");
-                for (Element p:pian){
+                for (Element p : pian) {
                     String pname = p.select("span").text();
                     Matcher pMacher = reg_play.matcher(p.attr("href"));
-                    if (!pMacher.find()){
+                    if (!pMacher.find()) {
                         continue;
                     }
                     String pdir = pMacher.group(1).trim();
-                    String all =pname + "#"+pdir;
+                    String all = pname + "#" + pdir;
                     ji_men.add(all);
                 }
-                String y_all = String.join("$",ji_men);
+                String y_all = String.join("$", ji_men);
                 ji_men.clear();
                 yuan_men.add(y_all);
             }
-            String v_url = String.join("$$$",yuan_men);
+            String v_url = String.join("$$$", yuan_men);
 
             list.put("vod_name", name);
             list.put("vod_pic", pic);
@@ -227,14 +229,14 @@ public class FreeOk extends Spider {
             list.put("vod_year", vy);
             list.put("vod_area", va);
             list.put("vod_remarks", vr);
-            list.put("vod_actor",vac);
-            list.put("vod_director",vd);
-            list.put("vod_content",vct);
-            list.put("vod_play_from",y_result);
-            list.put("vod_play_url",v_url);
+            list.put("vod_actor", vac);
+            list.put("vod_director", vd);
+            list.put("vod_content", vct);
+            list.put("vod_play_from", y_result);
+            list.put("vod_play_url", v_url);
 
-            result.put("list",list);
-            Log.d("ssss",list.toString());
+            result.put("list", list);
+            Log.d("ssss", list.toString());
             return result.toString();
         } catch (Exception e) {
             SpiderDebug.log(e);
@@ -244,90 +246,31 @@ public class FreeOk extends Spider {
 
     @Override
     public String searchContent(String key, boolean quick) {
-        String url = site_url+"/so1so/-------------.html?wd="+key;
-        Document doc = Jsoup.parse(OkHttpUtil.string(url,getHeaders()));
+        String url = site_url + "/so1so/-------------.html?wd=" + key;
+        Document doc = Jsoup.parse(OkHttpUtil.string(url, getHeaders()));
 
-
-
-        Log.d("adsadsda",doc.toString());
         return "";
     }
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) {
+        JSONObject result = new JSONObject();
         try {
             // 播放页 url
-            String url = site_url + "/x-play/"+id+".html";
+            String url = site_url + "/x-play/" + id + ".html";
             Document doc = Jsoup.parse(OkHttpUtil.string(url, getHeaders()));
             Elements allScript = doc.select("script");
-            JSONObject result = new JSONObject();
-            for (int i = 0; i < allScript.size(); i++) {
-                String scContent = allScript.get(i).html().trim();
-                if (scContent.startsWith("var player_")) {
-                    int start = scContent.indexOf('{');
-                    int end = scContent.lastIndexOf('}') + 1;
-                    String json = scContent.substring(start, end);
-                    JSONObject player = new JSONObject(json);
-                    if (playerConfig.has(player.getString("from"))) {
-                        JSONObject pCfg = playerConfig.getJSONObject(player.getString("from"));
-                        String videoUrl = player.getString("url");
-                        String playUrl = pCfg.getString("pu");
-                        String from = player.getString("from");
-                        if (from.equals("qqpic")) {
-                            // 感谢猫大神的直连解密代码
-                            HashMap<String, String> hds = getHeaders();
-                            hds.put("Host", "good-vip.mmiyue.com");
-                            hds.put("Referer", url);
-                            String content1 = OkHttpUtil.string(playUrl + videoUrl, hds);
-                            Document doc1 = Jsoup.parse(content1);
-                            String url2 = "https:" + doc1.selectFirst("iframe#player").attr("src");
-                            hds.put("Host", "pcc.mmiyue.com");
-                            hds.put("Referer", "http://good-vip.mmiyue.com/");
-                            String content2 = OkHttpUtil.string(url2, hds);
-                            String finder = "var id=\"";
-                            start = content2.indexOf(finder) + finder.length();
-                            end = content2.indexOf('\"', start);
-                            String vvid = content2.substring(start, end);
-                            finder = "var sk=\"";
-                            start = content2.indexOf(finder) + finder.length();
-                            end = content2.indexOf('\"', start);
-                            String skey = content2.substring(start, end);
-                            finder = "var pt=\"";
-                            start = content2.indexOf(finder) + finder.length();
-                            end = content2.indexOf('\"', start);
-                            String pt = content2.substring(start, end);
-                            finder = "var ti=\"";
-                            start = content2.indexOf(finder) + finder.length();
-                            end = content2.indexOf('\"', start);
-                            String time = content2.substring(start, end);
-                            int bkn = 0x195c;
-                            for (int j = 0x0, all = skey.length(); all > j; ++j) {
-                                bkn += ((bkn << 5) + (byte) skey.charAt(j));
-                            }
-                            bkn = 0x7fffffff & bkn;
-                            int gtk1 = 0x0;
-                            for (int j = 0x0; j < pt.length(); j += 0x4) {
-                                gtk1 += Integer.parseInt(String.format("%c%c%c%c", pt.charAt(j), pt.charAt(j + 0x1), pt.charAt(j + 0x2), pt.charAt(j + 0x3)), 0x10);
-                                gtk1 %= 0x400a;
-                            }
-                            int offset = gtk1 % 10;
-                            int gtk = 0x0;
-                            for (int j = 0x0; j < pt.length(); j++) {
-                                gtk += ((byte) pt.charAt(j)) * (j + offset);
-                                gtk %= gtk1;
-                            }
-                            String finalVideoUrl = "https://pcc.mmiyue.com/hls/play/" + vvid + "%7C" + time + "%7C" + skey + "%7C" + pt + "%7C" + bkn + "%7C" + gtk + ".m3u8";
-                            result.put("parse", pCfg.getInt("sn"));
-                            result.put("playUrl", "");
-                            result.put("url", finalVideoUrl);
-                            result.put("header", "");
-                        } else {
-                            result.put("parse", pCfg.getInt("sn"));
-                            result.put("playUrl", playUrl);
-                            result.put("url", videoUrl);
-                            result.put("header", "");
-                        }
-                    }
+            for (Element js : allScript) {
+                String ob = js.html().trim();
+                if (ob.startsWith("var player_")) {
+                    int start = ob.indexOf("{");
+                    JSONObject play = new JSONObject(ob.substring(start));
+                    String u = play.get("url").toString();
+                    u = URLDecoder.decode(u, "utf-8");
+                    result.put("parse", 0);
+                    result.put("playUrl", "");
+                    result.put("url", u);
+                    result.put("header", getHeaders());
                     break;
                 }
             }

@@ -2,6 +2,7 @@ package com.github.catvod.demo;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.github.catvod.spider.AppYsV2;
 import com.github.catvod.spider.FreeOk;
@@ -25,8 +26,10 @@ public class MainActivity extends Activity {
             public void run() {
                 FreeOk fo = new FreeOk();
                 fo.init(MainActivity.this);
-
-                fo.searchContent("繁花",false);
+                List<String> l = new ArrayList<>();
+                l.add("63293");
+                String a = fo.playerContent("超清", "63293-5-1", l);
+                Log.d("dsdsdadasdawsda", a);
             }
         }).start();
 
