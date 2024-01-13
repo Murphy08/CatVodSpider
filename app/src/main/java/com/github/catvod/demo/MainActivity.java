@@ -29,11 +29,12 @@ public class MainActivity extends Activity {
                 fo.init(MainActivity.this);
                 List<String> l = new ArrayList<>();
                 l.add("1645");
-                String a = fo.detailContent(l);
+                String a = fo.playerContent("", "241758-1-1", l);
                 FreeOk ff = new FreeOk();
+                ff.init(MainActivity.this);
                 List<String> la = new ArrayList<>();
                 la.add("59835");
-                String b = ff.detailContent(la);
+                String b = ff.playerContent("", "63062-7-1", l);
                 Log.d("dsdsdadasdawsda", a);
                 Log.d("dasdddwerwerwre", b);
             }
