@@ -197,7 +197,8 @@ public class FreeOk extends Spider {
                     have_kuake = true;
                 }
             }
-            String y_result = String.join("$$$", yr);
+            // hhhh
+            String y_result = String.join("$", yr);
             Elements ju_ji = doc.select("#panel1 > div > div");
             ArrayList<String> yuan_men = new ArrayList<>();
             ArrayList<String> ji_men = new ArrayList<>();
@@ -222,7 +223,8 @@ public class FreeOk extends Spider {
                 ji_men.clear();
                 yuan_men.add(y_all);
             }
-            String v_url = String.join("$$$", yuan_men);
+            //  hhhh
+            String v_url = String.join("$", yuan_men);
 
             list.put("vod_name", name);
             list.put("vod_pic", pic);
@@ -236,7 +238,8 @@ public class FreeOk extends Spider {
             list.put("vod_play_from", y_result);
             list.put("vod_play_url", v_url);
 
-            result.put("list", list);
+            ja.put(list);
+            result.put("list", ja);
             Log.d("ssss", list.toString());
             return result.toString();
         } catch (Exception e) {
@@ -255,8 +258,17 @@ public class FreeOk extends Spider {
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) {
-        JSONObject result = new JSONObject();
         try {
+            //定义播放用的headers
+            JSONObject headers = new JSONObject();
+            //headers.put("Host", " cokemv.co");
+            headers.put("origin", " https://nfxhd.com");
+            headers.put("User-Agent", " Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36");
+            headers.put("Accept", " */*");
+            headers.put("Accept-Language", " zh-CN,zh;q=0.9,en-US;q=0.3,en;q=0.7");
+            headers.put("Accept-Encoding", " gzip, deflate");
+            JSONObject result = new JSONObject();
+
             // 播放页 url
             String url = site_url + "/x-play/" + id + ".html";
             Document doc = Jsoup.parse(OkHttpUtil.string(url, getHeaders()));
@@ -271,7 +283,7 @@ public class FreeOk extends Spider {
                     result.put("parse", 0);
                     result.put("playUrl", u);
                     result.put("url", u);
-                    result.put("header", getHeaders());
+                    result.put("header", headers);
                     break;
                 }
             }

@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.github.catvod.spider.AppYsV2;
 import com.github.catvod.spider.FreeOk;
+import com.github.catvod.spider.Jumi;
 import com.github.catvod.spider.XPath;
 
 import org.json.JSONArray;
@@ -24,12 +25,17 @@ public class MainActivity extends Activity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                FreeOk fo = new FreeOk();
+                Jumi fo = new Jumi();
                 fo.init(MainActivity.this);
                 List<String> l = new ArrayList<>();
-                l.add("63293");
-                String a = fo.playerContent("超清", "63293-5-1", l);
+                l.add("1645");
+                String a = fo.detailContent(l);
+                FreeOk ff = new FreeOk();
+                List<String> la = new ArrayList<>();
+                la.add("59835");
+                String b = ff.detailContent(la);
                 Log.d("dsdsdadasdawsda", a);
+                Log.d("dasdddwerwerwre", b);
             }
         }).start();
 
