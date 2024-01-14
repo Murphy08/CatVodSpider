@@ -25,9 +25,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Dan extends Spider {
-    public static final String site_url = "http://www.freeok.pro";
-    Pattern regexCategory = Pattern.compile("/v-type/(\\S+).html");
-    Pattern reg_video_id = Pattern.compile("/vod-detail/(\\S+).html");
+    public static final String site_url = "https://dandanju.me/";
+    Pattern regexCategory = Pattern.compile("/type/(\\S+).html");
+    Pattern reg_video_id = Pattern.compile("/video/(\\S+).html");
 
     Pattern reg_play = Pattern.compile("/x-play/(\\S+).html");
 
@@ -73,14 +73,19 @@ public class Dan extends Spider {
             JSONObject result = new JSONObject();
             int num = 1;
             Document doc = Jsoup.parse(OkHttpUtil.string(site_url, getHeaders()));
-            Elements el = doc.select("li.swiper-slide> a");
+            Elements el = doc.select("div.ewave-header_bd.clearfix > div.ewave-header__menu > ul > li");
             JSONArray classes = new JSONArray();
+            JSONObject filters = new JSONObject();
             for (Element e : el) {
-                if (num > 6) {
+                if (num > 5) {
                     break;
                 }
-                String name = e.text();
-                Matcher reg = regexCategory.matcher(e.attr("href"));
+                String name = e.select("a").text();
+                if (name.equals("首页")) {
+                    continue;
+                }
+                Log.e("name", name);
+                Matcher reg = regexCategory.matcher(e.select("a").attr("href"));
                 if (!reg.find())
                     continue;
                 String id = reg.group(1).trim();
@@ -88,27 +93,68 @@ public class Dan extends Spider {
                 clasz.put("type_id", id);
                 clasz.put("type_name", name);
                 classes.put(clasz);
+
+                //筛选
+                if (filter) {
+                    Document d = Jsoup.parse(OkHttpUtil.string(site_url + "/type/" + id + ".html", getHeaders()));
+                    Elements es = d.select("div.ewave-pannel_hd > div.ewave-screen__list");
+                    JSONArray ja = new JSONArray();
+                    int key = 0;
+                    for (Element m : es) {
+                        JSONObject se = new JSONObject();
+                        String label = m.select("label > span").text();
+                        if (label.equals("按分类")) {
+                            continue;
+                        }
+                        Elements types = m.select("div > ul > li");
+                        JSONArray tys = new JSONArray();
+                        for (Element type : types) {
+                            JSONObject ty = new JSONObject();
+                            String n = type.select("a").text();
+
+                            String v = n;
+                            if (n.equals("全部")) {
+                                v = "";
+                            }
+                            ty.put("n", n);
+                            ty.put("v", v);
+                            tys.put(ty);
+                        }
+                        se.put("key", key);
+                        se.put("name", label);
+                        se.put("value", tys);
+                        ja.put(se);
+                        key++;
+                    }
+
+                    filters.put(id, ja);
+                }
+
+
                 num++;
             }
             result.put("class", classes);
+            result.put("filters", filters);
             Log.d("class", result.toString());
-            Elements els = doc.select(" div.module-main.scroll-box > div > a");
+
+
+            Elements els = doc.select("div.tab-content.ewave-pannel_bd > li");
             JSONArray lists = new JSONArray();
             for (Element e : els) {
                 JSONObject obj = new JSONObject();
-                String name = e.select("div.module-poster-item-info > div.module-poster-item-title").text();
-                System.out.println(e.attr("href"));
-                Matcher video_ma = reg_video_id.matcher(e.attr("href"));
+                String name = e.select("div> div").attr("title");
+                Matcher video_ma = reg_video_id.matcher(e.select("div > div > a").attr("href"));
                 if (!video_ma.find())
                     continue;
                 String id = video_ma.group(1).trim();
-                String pic = e.select("div.module-item-cover > div.module-item-pic > img").attr("data-original");
-                String remarks = e.select("div.module-item-cover > div.module-item-note").text();
+                String pic = e.select("div > div").attr("data-original");
+                String remarks = "";
                 obj.put("vod_id", id);
                 obj.put("vod_name", name);
                 obj.put("vod_pic", pic);
                 obj.put("vod_remarks", remarks);
                 lists.put(obj);
+                Log.d("lists", lists.toString());
             }
             result.put("list", lists);
             return result.toString();
@@ -132,14 +178,21 @@ public class Dan extends Spider {
     public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) {
         JSONObject result = new JSONObject();
         try {
-            result.put("page", pg);
-            result.put("limit", 40);
-            result.put("pagecount", 10);
-            result.put("total", 400);
-            String url = site_url + "/vod-show/" + tid + "--------" + pg + "---.html";
+            //https://dandanju.me/show/3-内地--选秀-----2---2022.html
+            String juqing = extend.get(0);
+            String diqu = extend.get(1);
+            String nianfen = extend.get(2);
+
+
+            String url = site_url + "/show/" + tid + "-" + diqu + "--" + juqing + "-----" + pg + "---" + nianfen + ".html";
             Log.d("url", url);
             Document doc = Jsoup.parse(OkHttpUtil.string(url, getHeaders()));
-            Log.d("url", doc.toString());
+            Elements pgcs = new Elements(doc.select("body > div:nth-child(2) > div > div.col-lg-wide-75.col-xs-1.padding-0 > ul > li:nth-child(8) > a"));
+            String pc = pgcs.get(0).attr("href");
+            int start = pc.indexOf("-");
+            int end = pc.indexOf(".") + 1;
+            pc = pc.substring(start, end);
+
             Elements elements = doc.select("div.module-main.module-page > div.module-items.module-poster-items-base > a");
             JSONArray lists = new JSONArray();
             for (Element e : elements) {
@@ -158,6 +211,10 @@ public class Dan extends Spider {
                 obj.put("vod_remarks", remarks);
                 lists.put(obj);
             }
+            result.put("page", pg);
+            result.put("limit", 36);
+            result.put("pagecount", pc);
+            result.put("total", 36 * Integer.parseInt(pc));
             result.put("list", lists);
             Log.d("aaa", result.toString());
 

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.github.catvod.spider.Dan;
 import com.github.catvod.spider.FreeOk;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class MainActivity extends Activity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                FreeOk ff = new FreeOk();
+                Dan ff = new Dan();
                 HashMap<String, String> hm = new HashMap<>();
                 List<String> la = new ArrayList<>();
                 la.add("59835");
