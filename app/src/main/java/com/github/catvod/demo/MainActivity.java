@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.github.catvod.spider.AppYsV2;
 import com.github.catvod.spider.FreeOk;
+import com.github.catvod.spider.Init;
 import com.github.catvod.spider.Jumi;
 import com.github.catvod.spider.XPath;
 
@@ -22,23 +23,12 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Jumi fo = new Jumi();
-                fo.init(MainActivity.this);
-                List<String> l = new ArrayList<>();
-                l.add("1645");
-                String a = fo.playerContent("", "241758-1-1", l);
-                FreeOk ff = new FreeOk();
-                ff.init(MainActivity.this);
-                List<String> la = new ArrayList<>();
-                la.add("59835");
-                String b = ff.playerContent("", "63062-7-1", l);
-                Log.d("dsdsdadasdawsda", a);
-                Log.d("dasdddwerwerwre", b);
-            }
-        }).start();
+        FreeOk ff = new FreeOk();
+        ff.init(MainActivity.this);
+//        List<String> la = new ArrayList<>();
+//        la.add("59835");
+//        String b = ff.playerContent("", "63062-7-1", la);
+//        Log.d("dasdddwerwerwre", b);
 
 
 //        new Thread(new Runnable() {

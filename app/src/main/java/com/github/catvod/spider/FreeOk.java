@@ -3,6 +3,7 @@ package com.github.catvod.spider;
 import android.content.Context;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.Toast;
 
 import com.github.catvod.crawler.Spider;
@@ -37,8 +38,19 @@ public class FreeOk extends Spider {
 
     @Override
     public void init(Context context) {
-        Log.e("mine", "调用了init");
         super.init(context);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                Toast t = Toast.makeText(context, "欢迎使用龙天接口", Toast.LENGTH_SHORT);
+                t.setDuration(Toast.LENGTH_LONG);
+                t.setGravity(Gravity.LEFT | Gravity.BOTTOM | Gravity.FILL_HORIZONTAL, 0, 0);
+                t.show();
+                Looper.loop();
+            }
+        }).start();
+
     }
 
     /**
