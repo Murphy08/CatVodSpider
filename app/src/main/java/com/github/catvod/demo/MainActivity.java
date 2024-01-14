@@ -4,15 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.github.catvod.spider.AppYsV2;
 import com.github.catvod.spider.FreeOk;
-import com.github.catvod.spider.Init;
-import com.github.catvod.spider.Jumi;
-import com.github.catvod.spider.XPath;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,8 +15,18 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FreeOk ff = new FreeOk();
-        ff.init(MainActivity.this);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                FreeOk ff = new FreeOk();
+                HashMap<String, String> hm = new HashMap<>();
+                List<String> la = new ArrayList<>();
+                la.add("59835");
+                String b = ff.homeContent(true);
+
+                Log.d("dasdddwerwerwre", b);
+            }
+        }).start();
 //        List<String> la = new ArrayList<>();
 //        la.add("59835");
 //        String b = ff.playerContent("", "63062-7-1", la);

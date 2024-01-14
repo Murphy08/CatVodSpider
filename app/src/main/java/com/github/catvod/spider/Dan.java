@@ -10,9 +10,7 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.utils.okhttp.OkHttpUtil;
 
-import org.apache.commons.lang3.CharSet;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,15 +18,13 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FreeOk extends Spider {
+public class Dan extends Spider {
     public static final String site_url = "http://www.freeok.pro";
     Pattern regexCategory = Pattern.compile("/v-type/(\\S+).html");
     Pattern reg_video_id = Pattern.compile("/vod-detail/(\\S+).html");
