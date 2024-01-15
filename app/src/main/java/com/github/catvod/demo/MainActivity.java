@@ -23,7 +23,7 @@ public class MainActivity extends Activity {
                 HashMap<String, String> hm = new HashMap<>();
                 List<String> la = new ArrayList<>();
                 la.add("59835");
-                String b = ff.homeContent(true);
+                String b = ff.categoryContent("1", "1", true, new HashMap<>());
 
                 Log.d("dasdddwerwerwre", b);
             }

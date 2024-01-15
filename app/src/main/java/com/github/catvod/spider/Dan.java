@@ -25,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Dan extends Spider {
-    public static final String site_url = "https://dandanju.me/";
+    public static final String site_url = "https://dandanju.me";
     Pattern regexCategory = Pattern.compile("/type/(\\S+).html");
     Pattern reg_video_id = Pattern.compile("/video/(\\S+).html");
 
@@ -178,33 +178,38 @@ public class Dan extends Spider {
     public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) {
         JSONObject result = new JSONObject();
         try {
-            //https://dandanju.me/show/3-内地--选秀-----2---2022.html
-            String juqing = extend.get(0);
-            String diqu = extend.get(1);
-            String nianfen = extend.get(2);
+            String url = "";
+            if (extend.size() > 0) {
+                //https://dandanju.me/show/3-内地--选秀-----2---2022.html
+                String juqing = extend.get(0);
+                String diqu = extend.get(1);
+                String nianfen = extend.get(2);
+
+                url = site_url + "/show/" + tid + "-" + diqu + "--" + juqing + "-----" + pg + "---" + nianfen + ".html";
+            } else {
+                url = site_url + "/type/" + tid + "-" + pg + ".html";
+            }
 
 
-            String url = site_url + "/show/" + tid + "-" + diqu + "--" + juqing + "-----" + pg + "---" + nianfen + ".html";
             Log.d("url", url);
             Document doc = Jsoup.parse(OkHttpUtil.string(url, getHeaders()));
             Elements pgcs = new Elements(doc.select("body > div:nth-child(2) > div > div.col-lg-wide-75.col-xs-1.padding-0 > ul > li:nth-child(8) > a"));
             String pc = pgcs.get(0).attr("href");
-            int start = pc.indexOf("-");
-            int end = pc.indexOf(".") + 1;
+            int start = pc.indexOf("-") + 1;
+            int end = pc.indexOf(".");
             pc = pc.substring(start, end);
 
-            Elements elements = doc.select("div.module-main.module-page > div.module-items.module-poster-items-base > a");
+            Elements elements = doc.select("body > div:nth-child(2) > div > div.col-lg-wide-75.col-xs-1.padding-0 > div:nth-child(2) > div > div > ul > li");
             JSONArray lists = new JSONArray();
             for (Element e : elements) {
                 JSONObject obj = new JSONObject();
-                String name = e.select("div.module-poster-item-info > div.module-poster-item-title").text();
-                System.out.println(e.attr("href"));
-                Matcher video_ma = reg_video_id.matcher(e.attr("href"));
+                String name = e.select("div > div.ewave-vodlist__detail > h4 > a").attr("title");
+                Matcher video_ma = reg_video_id.matcher(e.select("div > div.ewave-vodlist__detail > h4 > a").attr("href"));
                 if (!video_ma.find())
                     continue;
                 String id = video_ma.group(1).trim();
-                String img = e.select("div.module-item-pic >img").attr("data-original");
-                String remarks = e.select("div.module-item-cover > div.module-item-note").text();
+                String img = e.select("div > div.ewave-vodlist__thumb").attr("data-original");
+                String remarks = "";
                 obj.put("vod_id", id);
                 obj.put("vod_name", name);
                 obj.put("vod_pic", img);
