@@ -176,15 +176,30 @@ public class Dan extends Spider {
      */
     @Override
     public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) {
+        Log.d("eeeeeeeeextend", extend.toString());
         JSONObject result = new JSONObject();
         try {
             String url = "";
             if (extend.size() > 0) {
                 //https://dandanju.me/show/3-内地--选秀-----2---2022.html
-                String juqing = extend.get(0);
-                String diqu = extend.get(1);
-                String nianfen = extend.get(2);
-
+                String juqing = "";
+                String diqu = "";
+                String nianfen = "";
+                if (extend.get("0") == null) {
+                    juqing = "";
+                } else {
+                    juqing = extend.get("0");
+                }
+                if (extend.get("1") == null) {
+                    diqu = "";
+                } else {
+                    diqu = extend.get("1");
+                }
+                if (extend.get("2") == null) {
+                    nianfen = "";
+                } else {
+                    nianfen = extend.get("2");
+                }
                 url = site_url + "/show/" + tid + "-" + diqu + "--" + juqing + "-----" + pg + "---" + nianfen + ".html";
             } else {
                 url = site_url + "/type/" + tid + "-" + pg + ".html";
