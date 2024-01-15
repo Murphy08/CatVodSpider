@@ -1,6 +1,7 @@
 package com.github.catvod.demo;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -20,10 +21,12 @@ public class MainActivity extends Activity {
             @Override
             public void run() {
                 Dan ff = new Dan();
+                ff.init(MainActivity.this);
                 HashMap<String, String> hm = new HashMap<>();
+                hm.put("0", "喜剧");
                 List<String> la = new ArrayList<>();
-                la.add("59835");
-                String b = ff.categoryContent("1", "1", true, new HashMap<>());
+                la.add("64950");
+                String b = ff.playerContent("a", "64950-1-1", la);
 
                 Log.d("dasdddwerwerwre", b);
             }
