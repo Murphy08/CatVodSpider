@@ -1,12 +1,10 @@
 package com.github.catvod.demo;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.github.catvod.spider.Dan;
-import com.github.catvod.spider.FreeOk;
+import com.github.catvod.spider.Xingchen;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,13 +18,13 @@ public class MainActivity extends Activity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Dan ff = new Dan();
+                Xingchen ff = new Xingchen();
                 ff.init(MainActivity.this);
                 HashMap<String, String> hm = new HashMap<>();
                 hm.put("0", "喜剧");
                 List<String> la = new ArrayList<>();
-                la.add("64950");
-                String b = ff.playerContent("a", "64950-1-1", la);
+                la.add("/guocanju/fanhuahuyuban/1-23.html");
+                String b = ff.playerContent("", "/guocanju/fanhuahuyuban/1-23.html", la);
 
                 Log.d("dasdddwerwerwre", b);
             }
