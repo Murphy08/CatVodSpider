@@ -3,6 +3,7 @@ package com.github.catvod.spider;
 import android.app.Activity;
 import android.content.Context;
 
+import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 
 import java.lang.reflect.Field;
@@ -15,4 +16,6 @@ public class Init {
         mContext = context;
         SpiderDebug.log("自定义爬虫代码加载成功！");
     }
+
+
 }

@@ -2,7 +2,6 @@ package com.github.catvod.spider;
 
 import android.content.Context;
 import android.os.Looper;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
@@ -18,7 +17,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.net.URLEncoder;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,9 +27,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Xingchen extends Spider {
-    public static final String site_url = "http://www.hljtdmy.com";
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
+public class Liangzi extends Spider {
+    public static final String site_url = "http://quanji456.com";
+    public static final String play_url = "https://v.cdnlz3.com";
+    private Pattern m3_url = Pattern.compile("var main = \"(\\d+).m3u8");
 
     @Override
     public void init(Context context) {
@@ -58,105 +62,16 @@ public class Xingchen extends Spider {
         Log.e("mine", "调用了getHeaders");
         HashMap<String, String> headers = new HashMap<>();
         headers.put("method", "GET");
-        headers.put("Host", "quanji456.com");
-        headers.put("Upgrade-Insecure-Requests", "1");
-        headers.put("DNT", "1");
+        //headers.put("Host", "quanji456.com/");
+        //headers.put("Accept", "*/*");
+        //headers.put("Accept-Encoding", "gzip, deflate, br");
+        headers.put("Connection", "keep-alive");
         headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0");
-        headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-        headers.put("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2");
         return headers;
     }
 
     @Override
     public String homeContent(boolean filter) {
-        try {
-            JSONObject result = new JSONObject();
-            int num = 1;
-            Document doc = Jsoup.parse(OkHttpUtil.string(site_url, getHeaders()));
-            Elements el = doc.select("#example-navbar-collapse > ul > li");
-            JSONArray classes = new JSONArray();
-            for (Element e : el) {
-                if (num > 5) {
-                    break;
-                }
-                String name = e.select("a").text();
-                if (name.equals("首页")) {
-                    continue;
-                }
-                Log.e("name", name);
-                String id = e.select("a").attr("href").toString();
-                JSONObject clasz = new JSONObject();
-                clasz.put("type_id", id);
-                clasz.put("type_name", name);
-                classes.put(clasz);
-
-                //筛选
-                /*
-                if (filter) {
-                    Document d = Jsoup.parse(OkHttpUtil.string(site_url + "/type/" + id + ".html", getHeaders()));
-                    Elements es = d.select("div.ewave-pannel_hd > div.ewave-screen__list");
-                    JSONArray ja = new JSONArray();
-                    int key = 0;
-                    for (Element m : es) {
-                        JSONObject se = new JSONObject();
-                        String label = m.select("label > span").text();
-                        if (label.equals("按分类")) {
-                            continue;
-                        }
-                        Elements types = m.select("div > ul > li");
-                        JSONArray tys = new JSONArray();
-                        for (Element type : types) {
-                            JSONObject ty = new JSONObject();
-                            String n = type.select("a").text();
-
-                            String v = n;
-                            if (n.equals("全部")) {
-                                v = "";
-                            }
-                            ty.put("n", n);
-                            ty.put("v", v);
-                            tys.put(ty);
-                        }
-                        se.put("key", key);
-                        se.put("name", label);
-                        se.put("value", tys);
-                        ja.put(se);
-                        key++;
-                    }
-
-                    filters.put(id, ja);
-                }
-                */
-
-                num++;
-            }
-
-
-            result.put("class", classes);
-            //result.put("filters", filters);
-            Log.d("class", result.toString());
-
-
-            Elements els = doc.select("body > div.container > div > div:nth-child(2) > ul > li");
-            JSONArray lists = new JSONArray();
-            for (Element e : els) {
-                JSONObject obj = new JSONObject();
-                String name = e.select("a").attr("title");
-                String id = e.select("a").attr("href");
-                String pic = e.select("a").attr("data-original");
-                String remarks = e.select("a > span.note.text-bg-r").text();
-                obj.put("vod_id", id);
-                obj.put("vod_name", name);
-                obj.put("vod_pic", pic);
-                obj.put("vod_remarks", remarks);
-                lists.put(obj);
-                Log.d("lists", lists.toString());
-            }
-            result.put("list", lists);
-            return result.toString();
-        } catch (Exception e) {
-            SpiderDebug.log(e);
-        }
 
         return "";
     }
@@ -225,39 +140,40 @@ public class Xingchen extends Spider {
             list.put("vod_id", ids.get(0));
             String url = site_url + ids.get(0);
             Document doc = Jsoup.parse(OkHttpUtil.string(url, getHeaders()));
-            String name = doc.select("#zanpian-score > h1").text();
-            String pic = doc.select("body > div.container > div > div.layout-box.clearfix.p-0.mt-0 > div.col-md-9.col-sm-12.col-xs-12 > div.col-md-3.col-sm-3.col-xs-4.clearfix > div > a").attr("style").replace("background: url(", "").replace(") no-repeat top center;background-size:cover;", "");
-            Elements line = doc.select("#zanpian-score > ul > li:nth-child(3) > a");
+            String name = doc.select("#main > div > div.box.view-heading > div.video-info > div.video-info-header > h1").text();
+            String pic = doc.select("#main > div > div.box.view-heading > div.video-cover > div > div > img").attr("data-src").toString();
 
-            List<String> li = new LinkedList<>();
-            for (Element eeee : line) {
-                li.add(eeee.text());
-            }
-            String tn = String.join("、", li);
+            String tn = doc.select("#main > div > div.box.view-heading > div.video-info > div.video-info-header > div > div > a:nth-child(1) > span").text();
+            String vy = doc.select("#main > div > div.box.view-heading > div.video-info > div.video-info-header > div > div > a:nth-child(3)").html();
+            String va = doc.select("#main > div > div.box.view-heading > div.video-info > div.video-info-header > div > div > a:nth-child(4)").text();
+            String vr = doc.select("#main > div > div.box.view-heading > div.video-info > div.video-info-main > div:nth-child(4) > div").text();
 
-            String vy = doc.select("#zanpian-score > ul > li:nth-child(10)").text().replace("年代：", "");
-            String va = doc.select("#zanpian-score > ul > li.col-md-6.col-sm-6.col-xs-4.text.hidden-xs").text().replace("国家/地区：", "");
-            String vr = doc.select("#zanpian-score > ul > li:nth-child(2)").text().replace("清晰：", "");
-            line = doc.select("#zanpian-score > ul > li:nth-child(4) > a");
-            li.clear();
-            for (Element eeee : line) {
-                li.add(eeee.text());
+            String vac = doc.select("#main > div > div.box.view-heading > div.video-info > div.video-info-main > div:nth-child(2) > div").text();
+            String vd = doc.select("#main > div > div.box.view-heading > div.video-info > div.video-info-main > div:nth-child(1) > div > a").text();
+            String vct = doc.select("#main > div > div.box.view-heading > div.video-info > div.video-info-main > div:nth-child(7) > div").text().replace("展开", "").replace("收起", "");
+            Elements tv_from = doc.select("#main > div > div:nth-child(3) > div.module-heading > div.module-tab.module-player-tab > div > div.module-tab-content > div.module-tab-item.tab-item");
+            List<String> lst_from = new ArrayList<>();
+            for (Element f : tv_from) {
+                lst_from.add(f.attr("data-dropdown-value").trim());
             }
-            String vac = String.join("、", li);
-            String vd = doc.select("#zanpian-score > ul > li:nth-child(6)").text().replace("导演：", "");
-            String vct = doc.select("#zanpian-score > ul > li.col-md-12.col-sm-12.col-xs-12.pb-0 > span.details-content-all.collapse").text();
-            String y_result = doc.select("#playTab > li > a").text();
+            String y_result = String.join("$$$", lst_from);
 
-            Elements ju_ji = doc.select("#con_playlist_1 > li");
-            ArrayList<String> ji_men = new ArrayList<>();
-            for (Element es : ju_ji) {
-                String pname = es.select("a").text();
-                String pdir = es.select("a").attr("href");
-                String all = pname + "$" + pdir;
-                ji_men.add(all);
+            Elements yuans = doc.select("#main > div > div:nth-child(3) > div.module-list");
+            List<String> allJi = new ArrayList<>();
+            for (Element yuan : yuans) {
+                Elements jis = yuan.select("div.module-blocklist.scroll-box.scroll-box-y > div > a");
+                List<String> ji_men = new ArrayList<>();
+                for (Element ji : jis) {
+                    String ji_name = ji.select("span").text();
+                    String ji_url = ji.attr("href");
+                    String ji_all = ji_name + "$" + ji_url;
+                    ji_men.add(ji_all);
+                }
+                String v_url = String.join("#", ji_men);
+                allJi.add(v_url);
             }
-            Collections.reverse(ji_men);
-            String v_url = String.join("#", ji_men);
+            String tv_url = String.join("$$$", allJi);
+
 
             list.put("vod_name", name);
             list.put("vod_pic", pic);
@@ -269,7 +185,7 @@ public class Xingchen extends Spider {
             list.put("vod_director", vd);
             list.put("vod_content", vct);
             list.put("vod_play_from", y_result);
-            list.put("vod_play_url", v_url);
+            list.put("vod_play_url", tv_url);
 
             ja.put(list);
             result.put("list", ja);
@@ -283,20 +199,20 @@ public class Xingchen extends Spider {
 
     @Override
     public String searchContent(String key, boolean quick) {
-        String url = site_url + "/search/?wd=" + key;
+        String url = site_url + "/index.php/vod/search.html?wd=" + key;
         Log.e("search", url);
         Map<String, String> m = new HashMap<>();
         Document doc = Jsoup.parse(OkHttpUtil.string(url, m));
         JSONArray lists = new JSONArray();
         try {
-            Elements e = doc.select("#content > div");
+            Elements e = doc.select("#main > div > div.module > div > div > div");
             for (Element es : e) {
                 JSONObject tv = new JSONObject();
-                String id = es.select("div.col-md-9.col-sm-8.col-xs-9.clearfix.pb-0 > div > ul > li:nth-child(1) > a").attr("href");
+                String id = es.select("div.video-info > div.video-info-header > h3 > a").attr("href");
 
-                String name = es.select("div.col-md-9.col-sm-8.col-xs-9.clearfix.pb-0 > div > ul > li:nth-child(1) > a").attr("title");
-                String pic = es.select("div.col-md-3.col-sm-4.col-xs-3.news-box-txt-l.clearfix > a").attr("data-original");
-                String remarks = es.select("div.col-md-9.col-sm-8.col-xs-9.clearfix.pb-0 > div > ul > li:nth-child(1) > span").text();
+                String name = es.select("div.video-info > div.video-info-header > h3 > a").attr("title");
+                String pic = es.select("div.video-cover > div > div > img").attr("data-src");
+                String remarks = es.select("div.video-info > div.video-info-header > a").html();
                 tv.put("vod_id", id);
                 tv.put("vod_name", name);
                 tv.put("vod_pic", pic);
@@ -338,14 +254,30 @@ public class Xingchen extends Spider {
             Elements allScript = doc.select("script");
             for (Element js : allScript) {
                 String ob = js.html().trim();
-                if (ob.startsWith("var zanpiancms_player")) {
+                if (ob.startsWith("var player_aaaa")) {
                     int start = ob.indexOf("{");
                     JSONObject play = new JSONObject(ob.substring(start));
                     String u = play.get("url").toString();
+                    if (u.endsWith("m3u8")) {
+                        result.put("url", u);
+                    } else {
+                        Document e = Jsoup.parse(OkHttpUtil.string("u", getHeaders()));
+                        Elements scripts = e.select("script");
+                        for (Element i : scripts) {
+                            if (i.toString().contains("main")) {
+                                Matcher t_mc = m3_url.matcher(i.toString());
+                                if (t_mc.find()) {
+                                    String the_url = t_mc.group(1).toString().trim();
+                                    String final_url = play_url + the_url + ".m3u8";
+                                    result.put("url", final_url);
+                                }
+                            }
+                        }
 
+                    }
                     result.put("playUrl", "");
 
-                    result.put("url", u);
+
                     result.put("header", headers.toString());
                     break;
                 }

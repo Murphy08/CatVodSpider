@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.github.catvod.spider.Liangzi;
 import com.github.catvod.spider.Xingchen;
 
 import java.util.ArrayList;
@@ -18,13 +19,13 @@ public class MainActivity extends Activity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Xingchen ff = new Xingchen();
+                Liangzi ff = new Liangzi();
                 ff.init(MainActivity.this);
                 HashMap<String, String> hm = new HashMap<>();
                 hm.put("0", "喜剧");
                 List<String> la = new ArrayList<>();
-                la.add("/guocanju/fanhuahuyuban/1-23.html");
-                String b = ff.playerContent("", "/guocanju/fanhuahuyuban/1-23.html", la);
+                la.add("/index.php/vod/detail/id/71136.html");
+                String b = ff.playerContent("三大队", "/index.php/vod/play/id/71136/sid/2/nid/7.html", la);
 
                 Log.d("dasdddwerwerwre", b);
             }
