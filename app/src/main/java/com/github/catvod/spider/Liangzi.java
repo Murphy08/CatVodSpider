@@ -34,7 +34,7 @@ import okhttp3.Response;
 public class Liangzi extends Spider {
     public static final String site_url = "http://quanji456.com";
     public static final String play_url = "https://v.cdnlz3.com";
-    private Pattern m3_url = Pattern.compile("var main = \"(\\d+).m3u8");
+    private Pattern m3_url = Pattern.compile("(\\S+).m3u8");
 
     @Override
     public void init(Context context) {
@@ -261,14 +261,14 @@ public class Liangzi extends Spider {
                     if (u.endsWith("m3u8")) {
                         result.put("url", u);
                     } else {
-                        Document e = Jsoup.parse(OkHttpUtil.string("u", getHeaders()));
+                        Document e = Jsoup.parse(OkHttpUtil.string(u, m));
                         Elements scripts = e.select("script");
                         for (Element i : scripts) {
                             if (i.toString().contains("main")) {
                                 Matcher t_mc = m3_url.matcher(i.toString());
                                 if (t_mc.find()) {
-                                    String the_url = t_mc.group(1).toString().trim();
-                                    String final_url = play_url + the_url + ".m3u8";
+                                    String the_url = t_mc.group().toString().trim().replace("\"", "");
+                                    String final_url = play_url + the_url;
                                     result.put("url", final_url);
                                 }
                             }
@@ -282,6 +282,7 @@ public class Liangzi extends Spider {
                     break;
                 }
             }
+            Log.d("final", result.toString());
             return result.toString();
         } catch (Exception e) {
             SpiderDebug.log(e);

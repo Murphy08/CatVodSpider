@@ -25,7 +25,7 @@ public class MainActivity extends Activity {
                 hm.put("0", "喜剧");
                 List<String> la = new ArrayList<>();
                 la.add("/index.php/vod/detail/id/71136.html");
-                String b = ff.playerContent("三大队", "/index.php/vod/play/id/71136/sid/2/nid/7.html", la);
+                String b = ff.playerContent("三大队", "/index.php/vod/play/id/71136/sid/1/nid/7.html", la);
 
                 Log.d("dasdddwerwerwre", b);
             }
