@@ -34,7 +34,7 @@ import okhttp3.Response;
 public class Liangzi extends Spider {
     public static final String site_url = "http://quanji456.com";
     public static final String play_url = "https://v.cdnlz3.com";
-    private Pattern m3_url = Pattern.compile("(\\S+).m3u8");
+    private Pattern m3_url = Pattern.compile("(\\S+)index.m3u8");
 
     @Override
     public void init(Context context) {
@@ -267,7 +267,7 @@ public class Liangzi extends Spider {
                             if (i.toString().contains("main")) {
                                 Matcher t_mc = m3_url.matcher(i.toString());
                                 if (t_mc.find()) {
-                                    String the_url = t_mc.group().toString().trim().replace("\"", "");
+                                    String the_url = t_mc.group(1).toString().trim().replace("\"", "") + "2000k/hls/mixed.m3u8";
                                     String final_url = play_url + the_url;
                                     result.put("url", final_url);
                                 }
